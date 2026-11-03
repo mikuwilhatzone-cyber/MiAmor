@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="es" class="dark">
 <head>
   <meta charset="UTF-8">
@@ -114,21 +115,42 @@
     }
     .coraline-door-leaf {
       transform-origin: left center;
-      transition: transform 1.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1);
       transform-style: preserve-3d;
     }
     .door-opened {
-      transform: rotateY(-115deg);
+      transform: rotateY(-118deg);
     }
     
     /* Coraline Tunnel Vortex Animation */
     @keyframes vortexSpin {
-      0% { transform: rotate(0deg) scale(0.85); opacity: 0.6; }
-      50% { transform: rotate(180deg) scale(1.15); opacity: 1; }
-      100% { transform: rotate(360deg) scale(0.85); opacity: 0.6; }
+      0% { transform: rotate(0deg) scale(0.95); }
+      50% { transform: rotate(180deg) scale(1.18); }
+      100% { transform: rotate(360deg) scale(0.95); }
     }
     .vortex-swirl {
-      animation: vortexSpin 8s linear infinite;
+      animation: vortexSpin 9s linear infinite;
+    }
+
+    /* Tunnel zoom dive transition */
+    .tunnel-dive-zoom {
+      animation: cameraTunnelZoom 1.5s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+    }
+
+    @keyframes cameraTunnelZoom {
+      0% {
+        transform: scale(1) translateZ(0);
+        opacity: 1;
+        filter: blur(0px);
+      }
+      65% {
+        opacity: 1;
+      }
+      100% {
+        transform: scale(3.4) translateZ(300px);
+        opacity: 0;
+        filter: blur(8px);
+      }
     }
 
     /* Realistic Stitched Button Badge */
@@ -187,62 +209,86 @@
         <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-2 font-serif">
           Para <span class="bg-gradient-to-r from-indigo-300 via-purple-300 to-rose-300 bg-clip-text text-transparent">Citlali</span>
         </h1>
-        <p class="text-zinc-400 text-xs max-w-xs mx-auto leading-relaxed">
-          Detrás de esta pared se esconde algo hecho a tu medida. Usa la llave para abrir la pequeña puerta secreta.
+        <p class="text-zinc-300 text-xs max-w-xs mx-auto leading-relaxed font-medium">
+          Usa la llave para abrir la pequeña puerta secreta.
         </p>
       </div>
 
       <!-- ================= CORALINE 3D SECRET DOOR ================= -->
-      <div class="relative w-44 h-60 my-2 coraline-door-frame cursor-pointer select-none" onclick="unlockSecretDoor()">
+      <div id="doorPortalContainer" class="relative w-48 h-64 my-3 coraline-door-frame cursor-pointer select-none group transition-transform duration-700" onclick="unlockSecretDoor()">
         
+        <!-- Mystical Backlight Glow Behind Frame -->
+        <div id="doorPortalGlow" class="absolute -inset-5 rounded-full bg-gradient-to-r from-indigo-500/0 via-purple-500/0 to-cyan-400/0 blur-2xl pointer-events-none transition-all duration-1000 z-0"></div>
+
         <!-- Wall/Tunnel Portal Background behind door -->
-        <div class="absolute inset-0 rounded-t-full bg-gradient-to-b from-[#090b20] to-[#04040a] border-4 border-[#1f2038] shadow-[0_0_35px_rgba(79,70,229,0.45)] overflow-hidden flex items-center justify-center">
+        <div class="relative z-10 w-full h-full rounded-t-full bg-gradient-to-b from-[#0b0c26] via-[#060718] to-[#020207] border-4 border-[#2d2a4a] shadow-[0_0_35px_rgba(79,70,229,0.35)] overflow-hidden flex items-center justify-center">
           
           <!-- Swirling Tunnel Vortex (Visible through the open door) -->
-          <div id="tunnelVortex" class="absolute w-60 h-60 rounded-full bg-[radial-gradient(circle_at_center,_#818cf8_0%,_#4f46e5_30%,_#312e81_60%,_#05050f_90%)] vortex-swirl opacity-90 blur-[1px]"></div>
+          <div id="tunnelVortex" class="absolute w-72 h-72 rounded-full bg-[radial-gradient(circle_at_center,_#c7d2fe_0%,_#6366f1_22%,_#3b0764_50%,_#050512_80%)] vortex-swirl opacity-90 blur-[1px] transition-all duration-1000"></div>
           
-          <!-- Swirling spiderweb / spiral lines -->
+          <!-- Spiral / spiderweb tunnel threads -->
           <svg class="absolute inset-0 w-full h-full opacity-40 mix-blend-screen pointer-events-none" viewBox="0 0 200 300">
-            <path d="M100 150 Q130 90 100 30 Q70 90 100 150 Q160 170 180 230 Q120 220 100 150 Q40 210 20 230 Q50 170 100 150" fill="none" stroke="#c7d2fe" stroke-width="1.2" />
+            <path d="M100 150 Q130 90 100 30 Q70 90 100 150 Q160 170 180 230 Q120 220 100 150 Q40 210 20 230 Q50 170 100 150" fill="none" stroke="#e0e7ff" stroke-width="1.2" />
+            <circle cx="100" cy="150" r="18" fill="none" stroke="#a5b4fc" stroke-width="0.8" opacity="0.6" />
+            <circle cx="100" cy="150" r="42" fill="none" stroke="#818cf8" stroke-width="0.8" opacity="0.4" />
           </svg>
-
-          <!-- Floating keyhole hint inside -->
-          <span class="relative z-10 text-2xl filter drop-shadow-[0_0_10px_#a5b4fc]">✨</span>
         </div>
 
-        <!-- The Door Leaf (Hinged 3D element) -->
-        <div id="secretDoorLeaf" class="coraline-door-leaf absolute inset-0 rounded-t-full bg-gradient-to-b from-[#211d2e] via-[#161424] to-[#0c0b16] border-4 border-[#352f4a] shadow-2xl flex flex-col items-center justify-between p-4 z-20">
+        <!-- The Door Leaf (Hinged 3D element with realistic wooden plank textures & iron hinges) -->
+        <div id="secretDoorLeaf" class="coraline-door-leaf absolute inset-0 rounded-t-full bg-[#1c1829] border-4 border-[#3c3654] shadow-2xl flex flex-col justify-between p-3.5 z-20 overflow-hidden" style="background-image: repeating-linear-gradient(90deg, #181523 0px, #181523 38px, #252037 39px, #2e2844 40px, #181523 41px);">
           
-          <!-- Ornate upper carving -->
-          <div class="w-12 h-12 rounded-full border border-purple-400/20 flex items-center justify-center mt-2 bg-black/40">
-            <span class="text-xs text-indigo-300">🗝️</span>
+          <!-- Subtle wood grain & vignette overlay -->
+          <div class="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/60 pointer-events-none"></div>
+
+          <!-- Iron Hinge Top-Left -->
+          <div class="absolute top-12 left-0 w-6 h-3 bg-gradient-to-r from-zinc-800 to-zinc-950 border-y border-r border-amber-600/40 rounded-r shadow-md flex items-center justify-end pr-1 z-30">
+            <div class="w-1.5 h-1.5 rounded-full bg-amber-500/60 shadow-inner"></div>
+          </div>
+          <!-- Iron Hinge Bottom-Left -->
+          <div class="absolute bottom-12 left-0 w-6 h-3 bg-gradient-to-r from-zinc-800 to-zinc-950 border-y border-r border-amber-600/40 rounded-r shadow-md flex items-center justify-end pr-1 z-30">
+            <div class="w-1.5 h-1.5 rounded-full bg-amber-500/60 shadow-inner"></div>
           </div>
 
-          <!-- Door Details / Peeling Vintage Wallpaper Vibe -->
-          <div class="w-full flex flex-col items-center gap-2">
-            <div class="w-24 h-1 bg-white/5 rounded-full"></div>
-            <div class="w-16 h-1 bg-white/5 rounded-full"></div>
+          <!-- Ornate upper arch & carved star emblem -->
+          <div class="relative z-10 flex flex-col items-center mt-2">
+            <div class="w-11 h-11 rounded-full border-2 border-amber-500/30 bg-[#0d0a17]/80 flex items-center justify-center shadow-inner">
+              <span class="text-sm filter drop-shadow-[0_0_4px_rgba(245,158,11,0.6)] text-amber-300">★</span>
+            </div>
+            <div class="w-20 h-0.5 bg-amber-500/20 rounded-full mt-2.5"></div>
           </div>
 
-          <!-- Door Handle & Black Keyhole with Key -->
-          <div class="w-full flex justify-end pr-3 pb-8 relative">
+          <!-- Horizontal decorative iron brace bars -->
+          <div class="relative z-10 w-full flex flex-col items-center gap-7 my-auto">
+            <div class="w-11/12 h-1 bg-black/50 border-t border-white/10 rounded-full shadow-inner flex justify-around px-2 items-center">
+              <div class="w-1 h-1 rounded-full bg-zinc-600"></div>
+              <div class="w-1 h-1 rounded-full bg-zinc-600"></div>
+            </div>
+            <div class="w-11/12 h-1 bg-black/50 border-t border-white/10 rounded-full shadow-inner flex justify-around px-2 items-center">
+              <div class="w-1 h-1 rounded-full bg-zinc-600"></div>
+              <div class="w-1 h-1 rounded-full bg-zinc-600"></div>
+            </div>
+          </div>
+
+          <!-- Ornate Keyhole Plate & Button Skeleton Key -->
+          <div class="relative z-10 w-full flex justify-end pr-2.5 pb-6">
             <div class="relative flex items-center">
-              <!-- Keyhole plate -->
-              <div class="w-8 h-12 rounded-lg bg-[#0e0c17] border border-amber-500/30 flex flex-col items-center justify-center shadow-inner">
+              <!-- Vintage Ornate Escutcheon / Keyhole plate -->
+              <div class="w-7 h-12 rounded-md bg-gradient-to-b from-[#2b2518] to-[#120f0a] border-2 border-amber-500/50 flex flex-col items-center justify-center shadow-[inset_0_1px_3px_rgba(255,255,255,0.2),0_2px_8px_rgba(0,0,0,0.8)]">
+                <!-- Tiny screws -->
+                <div class="w-1 h-1 rounded-full bg-amber-400/70 mb-1"></div>
+                <!-- Keyhole slot -->
                 <div class="w-2 h-2 rounded-full bg-black shadow-inner"></div>
-                <div class="w-1 h-3 bg-black"></div>
+                <div class="w-1 h-2.5 bg-black"></div>
+                <div class="w-1 h-1 rounded-full bg-amber-400/70 mt-1"></div>
               </div>
-              <!-- Glowing Button Key Attached -->
-              <div class="absolute -right-3 -top-1 animate-pulse">
-                <span class="text-2xl filter drop-shadow-[0_0_6px_rgba(244,63,94,0.8)]">🗝️</span>
+
+              <!-- Button-headed Skeleton Key inserted in lock -->
+              <div id="doorKeyObj" class="absolute -right-3.5 -top-1.5 transition-transform duration-500 origin-left">
+                <span class="text-2xl filter drop-shadow-[0_0_8px_rgba(244,63,94,0.9)] select-none">🗝️</span>
               </div>
             </div>
           </div>
 
-          <!-- Base Step -->
-          <div class="text-[9px] tracking-widest uppercase font-mono text-zinc-500 mb-1">
-            SECRET DOOR
-          </div>
         </div>
 
       </div>
@@ -253,22 +299,17 @@
         <span>Abrir la puerta secreta</span>
         <i data-lucide="sparkles" class="w-4 h-4 text-indigo-300 group-hover:rotate-12 transition-transform"></i>
       </button>
-
-      <p class="text-[11px] text-zinc-500 mt-4 tracking-wide animate-pulse">
-        (Toca la puerta o el botón para cruzar al otro mundo)
-      </p>
     </section>
 
     <!-- ==================== SCREEN 2: MAIN EXPERIENCE ==================== -->
     <main id="mainContent" class="hidden opacity-0 flex-col space-y-12 transition-opacity duration-700 pt-2">
       
       <!-- Section 1: Intro Banner -->
-      <div class="text-center pt-2">
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-medium bg-rose-500/10 text-rose-300 border border-rose-500/20 mb-3">
-          <i data-lucide="sparkle" class="w-3 h-3 mr-1 text-rose-400"></i> Una cajita de sorpresas
-        </span>
-        <h2 class="text-2xl font-bold text-white tracking-tight">Mis facetas para ti</h2>
-        <p class="text-xs text-zinc-400 mt-1 max-w-xs mx-auto">
+      <div class="text-center pt-4">
+        <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-pink-300 via-rose-300 to-indigo-300 bg-clip-text text-transparent font-serif drop-shadow-[0_0_20px_rgba(244,63,94,0.35)]">
+          Una cajita de sorpresas
+        </h2>
+        <p class="text-xs text-zinc-400 mt-2 max-w-xs mx-auto">
           Toca cada tarjeta para voltearla y descubrir lo que hay detrás.
         </p>
       </div>
@@ -276,25 +317,30 @@
       <!-- Section 2: 3D Flip Card Collage (Facets Grid) -->
       <section class="grid grid-cols-2 gap-3.5 perspective-1000">
 
-        <!-- Card 1: Coraline / La Puerta Secreta (Col-Span-2 for special emphasis) -->
+        <!-- Card 1: Coraline / Misterio y nuestra conexión -->
         <div class="flip-card col-span-2 h-44 cursor-pointer" onclick="handleFlipCard(this, 'chime4')">
           <div class="flip-card-inner relative w-full h-full duration-500 transform-style-3d transition-transform rounded-2xl">
             <!-- Front -->
             <div class="flip-front absolute inset-0 backface-hidden glass-card rounded-2xl p-4 flex flex-col justify-between border border-indigo-500/30 hover:border-indigo-400/60 shadow-lg bg-gradient-to-br from-[#0c0d1e]/85 to-[#070712]/90">
               <div class="flex items-center justify-between">
-                <div class="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-300 text-xl shadow-inner">
-                  🗝️
+                <!-- Minimalist Vector Key & Button Icon -->
+                <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-300 shadow-inner">
+                  <svg class="w-5 h-5 text-indigo-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="7.5" cy="15.5" r="4.5"/>
+                    <path d="m10.7 12.3 8.8-8.8"/>
+                    <path d="m16 7 2 2"/>
+                    <path d="m19 4 2 2"/>
+                  </svg>
                 </div>
                 <span class="text-[10px] tracking-widest uppercase font-semibold text-indigo-300/80 bg-indigo-500/10 px-2.5 py-0.5 rounded-full border border-indigo-500/20">
-                  El Otro Mundo
+                  Especial
                 </span>
               </div>
               <div>
-                <p class="text-[11px] font-semibold text-indigo-400 uppercase tracking-wider">Misterio & Conexión</p>
-                <h3 class="text-sm font-semibold text-zinc-100 mt-0.5">Nuestra Puerta Secreta</h3>
+                <h3 class="text-sm font-semibold text-zinc-100 tracking-wide">Misterio y nuestra conexión</h3>
               </div>
-              <span class="text-[10px] text-zinc-400 flex items-center gap-1">
-                <i data-lucide="touchpad" class="w-3 h-3"></i> Toca para descubrir el secreto
+              <span class="text-[10px] text-zinc-400 flex items-center gap-1.5">
+                <i data-lucide="sparkles" class="w-3 h-3 text-indigo-400"></i> Toca para descubrir el secreto
               </span>
             </div>
             <!-- Back -->
@@ -316,8 +362,15 @@
           <div class="flip-card-inner relative w-full h-full duration-500 transform-style-3d transition-transform rounded-2xl">
             <!-- Front -->
             <div class="flip-front absolute inset-0 backface-hidden glass-card rounded-2xl p-4 flex flex-col justify-between border border-rose-500/20 hover:border-rose-400/50 shadow-lg">
-              <div class="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 text-xl">
-                🎸
+              <!-- Minimalist Vector Guitar / Acoustic Notes Icon -->
+              <div class="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shadow-inner">
+                <svg class="w-5 h-5 text-rose-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m11.9 12.1 6.5-6.5"/>
+                  <circle cx="6" cy="18" r="4"/>
+                  <path d="M9.8 14.2c.4-.4 1-.4 1.4 0l1.4 1.4c.4.4.4 1 0 1.4"/>
+                  <path d="M16 4.5 19.5 8"/>
+                  <circle cx="18" cy="6" r="1" fill="currentColor"/>
+                </svg>
               </div>
               <div>
                 <p class="text-[11px] font-semibold text-rose-400 uppercase tracking-wider">Música & Acordes</p>
@@ -342,11 +395,19 @@
           <div class="flip-card-inner relative w-full h-full duration-500 transform-style-3d transition-transform rounded-2xl">
             <!-- Front -->
             <div class="flip-front absolute inset-0 backface-hidden glass-card rounded-2xl p-4 flex flex-col justify-between border border-amber-500/20 hover:border-amber-400/50 shadow-lg">
-              <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 text-xl">
-                🍳
+              <!-- Minimalist Vector Chef / Culinary Pan Icon -->
+              <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shadow-inner">
+                <svg class="w-5 h-5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 13.8V4a2 2 0 0 1 4 0v9.8"/>
+                  <path d="M14 4v9.8"/>
+                  <path d="M18 4v9.8"/>
+                  <path d="M10 13.8a4 4 0 0 0 8 0"/>
+                  <path d="M14 17.8V21a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3.2"/>
+                  <path d="M4 10h4"/>
+                </svg>
               </div>
               <div>
-                <p class="text-[11px] font-semibold text-amber-400 uppercase tracking-wider">El Arte Culinario</p>
+                <p class="text-[11px] font-semibold text-amber-400 uppercase tracking-wider">Arte de la cocina</p>
                 <h3 class="text-sm font-semibold text-zinc-100 mt-0.5">La Cocina & Pan</h3>
               </div>
               <span class="text-[10px] text-zinc-400 flex items-center gap-1">
@@ -368,11 +429,16 @@
           <div class="flip-card-inner relative w-full h-full duration-500 transform-style-3d transition-transform rounded-2xl">
             <!-- Front -->
             <div class="flip-front absolute inset-0 backface-hidden glass-card rounded-2xl p-4 flex flex-col justify-between border border-cyan-500/20 hover:border-cyan-400/50 shadow-lg">
-              <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 text-xl">
-                💻
+              <!-- Minimalist Vector Code Tag Icon -->
+              <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 shadow-inner">
+                <svg class="w-5 h-5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="16 18 22 12 16 6"/>
+                  <polyline points="8 6 2 12 8 18"/>
+                  <line x1="14" y1="4" x2="10" y2="20"/>
+                </svg>
               </div>
               <div>
-                <p class="text-[11px] font-semibold text-cyan-400 uppercase tracking-wider">Lógica & Creación</p>
+                <p class="text-[11px] font-semibold text-cyan-400 uppercase tracking-wider">Creación</p>
                 <h3 class="text-sm font-semibold text-zinc-100 mt-0.5">Programar</h3>
               </div>
               <span class="text-[10px] text-zinc-400 flex items-center gap-1">
@@ -394,8 +460,17 @@
           <div class="flip-card-inner relative w-full h-full duration-500 transform-style-3d transition-transform rounded-2xl">
             <!-- Front -->
             <div class="flip-front absolute inset-0 backface-hidden glass-card rounded-2xl p-4 flex flex-col justify-between border border-emerald-500/20 hover:border-emerald-400/50 shadow-lg">
-              <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-xl">
-                🏋️‍♂️
+              <!-- Minimalist Vector Dumbbell Icon -->
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-inner">
+                <svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m6.5 6.5 11 11"/>
+                  <path d="m21 21-1-1"/>
+                  <path d="m3 3 1 1"/>
+                  <path d="m18 22 4-4"/>
+                  <path d="m2 6 4-4"/>
+                  <path d="m3 10 7-7"/>
+                  <path d="m14 21 7-7"/>
+                </svg>
               </div>
               <div>
                 <p class="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider">Fuerza & Dedicación</p>
@@ -420,11 +495,16 @@
           <div class="flip-card-inner relative w-full h-full duration-500 transform-style-3d transition-transform rounded-2xl">
             <!-- Front -->
             <div class="flip-front absolute inset-0 backface-hidden glass-card rounded-2xl p-4 flex flex-col justify-between border border-purple-500/20 hover:border-purple-400/50 shadow-lg">
-              <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-xl">
-                🎨
+              <!-- Minimalist Vector Fine Brush / Pen Icon -->
+              <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shadow-inner">
+                <svg class="w-5 h-5 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m14 4 6 6-12 12H2v-6L14 4z"/>
+                  <path d="m18 8-4-4"/>
+                  <circle cx="6" cy="18" r="1" fill="currentColor"/>
+                </svg>
               </div>
               <div>
-                <p class="text-[11px] font-semibold text-purple-400 uppercase tracking-wider">Trazo a Trazo</p>
+                <p class="text-[11px] font-semibold text-purple-400 uppercase tracking-wider">Detalle por detalle</p>
                 <h3 class="text-sm font-semibold text-zinc-100 mt-0.5">Dibujar</h3>
               </div>
               <span class="text-[10px] text-zinc-400 flex items-center gap-1">
@@ -441,17 +521,22 @@
           </div>
         </div>
 
-        <!-- Card 7: Brindis & Buena Vibra -->
+        <!-- Card 7: Momentos para pistear -->
         <div class="flip-card col-span-2 sm:col-span-1 h-44 cursor-pointer" onclick="handleFlipCard(this, 'chime2')">
           <div class="flip-card-inner relative w-full h-full duration-500 transform-style-3d transition-transform rounded-2xl">
             <!-- Front -->
             <div class="flip-front absolute inset-0 backface-hidden glass-card rounded-2xl p-4 flex flex-col justify-between border border-pink-500/20 hover:border-pink-400/50 shadow-lg">
-              <div class="w-10 h-10 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-400 text-xl">
-                🥂
+              <!-- Minimalist Vector Cocktail Glass Icon -->
+              <div class="w-10 h-10 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-400 shadow-inner">
+                <svg class="w-5 h-5 text-pink-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m8 22 8 0"/>
+                  <path d="m12 15 0 7"/>
+                  <path d="M19 3 5 3l7 8.5Z"/>
+                </svg>
               </div>
               <div>
-                <p class="text-[11px] font-semibold text-pink-400 uppercase tracking-wider">Momentos Chidos</p>
-                <h3 class="text-sm font-semibold text-zinc-100 mt-0.5">El Brindis</h3>
+                <p class="text-[11px] font-semibold text-pink-400 uppercase tracking-wider">El Brindis</p>
+                <h3 class="text-sm font-semibold text-zinc-100 mt-0.5">Momentos para pistear</h3>
               </div>
               <span class="text-[10px] text-zinc-400 flex items-center gap-1">
                 <i data-lucide="touchpad" class="w-3 h-3"></i> Toca para ver
@@ -525,43 +610,56 @@
       </section>
 
       <!-- Section 4: The Proposal / Ask Out -->
-      <section class="glass-card rounded-3xl p-6 text-center border border-white/10 relative overflow-hidden shadow-2xl">
-        <div class="w-12 h-12 mx-auto rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 mb-3">
-          <i data-lucide="heart-handshake" class="w-6 h-6"></i>
+      <section class="relative rounded-3xl p-7 text-center overflow-hidden border border-rose-500/30 bg-gradient-to-b from-[#131024]/90 via-[#0a0814]/95 to-[#04040a] shadow-[0_0_50px_rgba(244,63,94,0.25)]">
+        
+        <!-- Animated pulsing ambient aura -->
+        <div class="absolute -top-16 -left-16 w-48 h-48 bg-rose-500/25 rounded-full blur-3xl pointer-events-none animate-pulse"></div>
+        <div class="absolute -bottom-16 -right-16 w-48 h-48 bg-indigo-500/25 rounded-full blur-3xl pointer-events-none animate-pulse" style="animation-delay: 1.5s;"></div>
+
+        <!-- Stylized Minimalist Heart & Key Icon Badge -->
+        <div class="relative w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-rose-500/20 via-purple-500/20 to-indigo-500/20 border border-rose-400/50 flex items-center justify-center text-rose-300 mb-4 shadow-[0_0_25px_rgba(244,63,94,0.4)]">
+          <svg class="w-7 h-7 text-rose-400 animate-pulse" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
         </div>
 
-        <h3 class="text-xl font-bold text-white mb-1.5 font-serif">¿Quieres ser mi novia?</h3>
-        <p class="text-xs text-zinc-400 mb-6 max-w-xs mx-auto leading-relaxed">
+        <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-rose-200 via-pink-200 to-indigo-200 bg-clip-text text-transparent mb-2 font-serif drop-shadow-[0_2px_15px_rgba(244,63,94,0.4)]">
+          ¿Quieres ser mi novia?
+        </h3>
+        
+        <p class="text-xs text-zinc-300/90 mb-7 max-w-xs mx-auto leading-relaxed font-light">
           (Aunque posiblemente ya te lo haya dicho en persona el día en que veas esto, aún así quiero preguntártelo por aquí también ❤️)
         </p>
 
         <!-- Buttons Container (With runaway "No" button) -->
-        <div id="btnContainer" class="relative min-h-[90px] flex items-center justify-center gap-4">
+        <div id="btnContainer" class="relative min-h-[95px] flex items-center justify-center gap-4">
           
-          <!-- YES Button -->
-          <button id="yesBtn" onclick="handleYesClick()" class="px-7 py-3 rounded-2xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-semibold text-sm shadow-neon-rose active:scale-95 transition-all flex items-center gap-2">
+          <!-- YES Button with high-energy pulsing glow -->
+          <button id="yesBtn" onclick="handleYesClick()" class="relative px-8 py-3.5 rounded-2xl bg-gradient-to-r from-rose-600 via-pink-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white font-semibold text-sm shadow-[0_0_30px_rgba(244,63,94,0.65)] hover:shadow-[0_0_45px_rgba(236,72,153,0.85)] active:scale-95 transition-all duration-300 flex items-center gap-2.5 z-10 border border-white/20">
             <span>¡Sí, obvio!</span>
-            <i data-lucide="heart" class="w-4 h-4 fill-white"></i>
+            <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
           </button>
 
           <!-- NO Button (Dodging Button) -->
-          <button id="noBtn" onmouseover="dodgeButton()" onclick="dodgeButton()" class="px-6 py-3 rounded-2xl bg-zinc-800/80 hover:bg-zinc-800 text-zinc-400 font-medium text-sm border border-zinc-700/50 transition-transform duration-200 select-none touch-none">
+          <button id="noBtn" onmouseover="dodgeButton()" onclick="dodgeButton()" class="px-6 py-3 rounded-2xl bg-zinc-900/90 hover:bg-zinc-800 text-zinc-400 font-medium text-sm border border-zinc-700/60 transition-transform duration-200 select-none touch-none shadow-inner">
             No 🙈
           </button>
 
         </div>
 
         <!-- Success Modal / Coraline Themed Celebration Box -->
-        <div id="successBox" class="hidden mt-6 p-6 rounded-3xl bg-gradient-to-b from-[#121124] via-[#0b0a17] to-[#06060c] border border-indigo-500/40 text-center relative overflow-hidden shadow-[0_0_40px_rgba(99,102,241,0.35)] animate-fade-in">
+        <div id="successBox" class="hidden mt-6 p-7 rounded-3xl bg-gradient-to-b from-[#14122b] via-[#0d0a1d] to-[#040409] border-2 border-indigo-500/50 text-center relative overflow-hidden shadow-[0_0_50px_rgba(99,102,241,0.5)] animate-fade-in">
           
-          <!-- Mystical Portal Background Swirl -->
-          <div class="absolute -top-10 -right-10 w-44 h-44 rounded-full bg-indigo-600/20 blur-3xl pointer-events-none"></div>
-          <div class="absolute -bottom-10 -left-10 w-44 h-44 rounded-full bg-rose-500/15 blur-3xl pointer-events-none"></div>
+          <!-- Mystical Portal Background Swirl with enhanced brightness -->
+          <div class="absolute -top-12 -right-12 w-52 h-52 rounded-full bg-indigo-600/30 blur-3xl pointer-events-none"></div>
+          <div class="absolute -bottom-12 -left-12 w-52 h-52 rounded-full bg-rose-500/25 blur-3xl pointer-events-none"></div>
 
-          <!-- Stitched Button & Key Badge -->
-          <div class="relative flex items-center justify-center gap-3 mb-3">
+          <!-- Stitched Button & Key Badge with glowing halo -->
+          <div class="relative flex items-center justify-center gap-3.5 mb-4">
             <!-- Coraline Small Stitched Button -->
-            <div class="w-12 h-12 rounded-full black-button-eye border border-indigo-400/50 p-1 flex items-center justify-center shadow-lg relative">
+            <div class="w-13 h-13 rounded-full black-button-eye border border-indigo-400/60 p-1 flex items-center justify-center shadow-lg relative">
               <div class="grid grid-cols-2 gap-1.5 z-10">
                 <div class="w-1.5 h-1.5 rounded-full bg-[#050508] border border-white/20"></div>
                 <div class="w-1.5 h-1.5 rounded-full bg-[#050508] border border-white/20"></div>
@@ -575,32 +673,35 @@
             </div>
 
             <!-- The Skeleton Key with Ribbon -->
-            <div class="w-12 h-12 rounded-2xl bg-indigo-500/15 border border-indigo-400/40 flex items-center justify-center text-2xl shadow-inner animate-bounce">
+            <div class="w-13 h-13 rounded-2xl bg-indigo-500/20 border border-indigo-400/50 flex items-center justify-center text-2xl shadow-inner animate-bounce">
               🗝️
             </div>
 
             <!-- Heart Badge -->
-            <div class="w-12 h-12 rounded-full bg-rose-500/20 border border-rose-400/40 flex items-center justify-center text-rose-300 text-xl shadow-lg">
+            <div class="w-13 h-13 rounded-full bg-rose-500/25 border border-rose-400/50 flex items-center justify-center text-rose-300 text-xl shadow-lg">
               🖤
             </div>
           </div>
 
-          <span class="inline-block px-3 py-1 rounded-full text-[10px] tracking-widest font-mono uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 mb-2">
+          <span class="inline-block px-3.5 py-1 rounded-full text-[10px] tracking-widest font-mono uppercase bg-indigo-500/25 text-indigo-300 border border-indigo-500/40 mb-2.5">
             🗝️ Bienvenido a Nuestro Mundo
           </span>
 
-          <h4 class="text-lg font-bold text-white font-serif tracking-tight">¡Bienvenida a nuestro propio mundo!</h4>
+          <h4 class="text-xl font-bold text-white font-serif tracking-tight drop-shadow-[0_2px_10px_rgba(255,255,255,0.2)]">
+            ¡Bienvenida a nuestro propio mundo!
+          </h4>
           
           <p class="text-xs text-indigo-200 mt-2 leading-relaxed px-1 font-light">
             Sin botones en los ojos, sin trampas de la Otra Madre... solo nosotros dos. Oficialmente eres mi novia y mi niña favorita. 🖤
           </p>
 
           <!-- Quote Block -->
-          <div class="my-3.5 p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/30 text-indigo-100 text-xs italic">
+          <div class="my-4 p-3.5 rounded-xl bg-indigo-950/50 border border-indigo-500/40 text-indigo-100 text-xs italic">
             "De todos los mundos posibles detrás de la puerta secreta, me quedo en este contigo para siempre." ✨
           </div>
 
-          <div class="flex items-center justify-center gap-2 text-xs font-semibold text-rose-300">
+          <!-- The main requested celebration phrase highlighted with an energetic aura -->
+          <div class="mt-2 py-2 px-3 rounded-2xl bg-gradient-to-r from-rose-950/60 via-purple-950/60 to-indigo-950/60 border border-rose-400/50 shadow-[0_0_25px_rgba(244,63,94,0.35)] flex items-center justify-center gap-2 text-sm font-bold text-rose-200">
             <span>Ya estás 100% enamorada conmigo</span>
             <span>🗝️✨</span>
           </div>
@@ -608,11 +709,6 @@
         </div>
 
       </section>
-
-      <!-- Footer Sign -->
-      <footer class="text-center pt-4 pb-8 text-zinc-500 text-xs">
-        <p>Hecho con código, café y mucho cariño para Citlali</p>
-      </footer>
 
     </main>
 
@@ -847,32 +943,83 @@
         toggleAudio(); // Start sound & chords
       }
 
-      // Play unlocking door creak / mystical chords
+      // First: Turn the key with animation & subtle glow
+      const keyObj = document.getElementById('doorKeyObj');
+      if (keyObj) {
+        keyObj.style.transform = 'rotate(-90deg) scale(1.15)';
+        keyObj.style.filter = 'drop-shadow(0 0 10px rgba(6, 182, 212, 0.9))';
+      }
+
+      // Sound sequence for key click & mystical portal opening
       if (audioCtx && !isMuted) {
-        [440, 554.37, 659.25, 880, 1108.73].forEach((f, i) => {
-          setTimeout(() => playNote(f, 1.2, 'sine', 0.15), i * 110);
-        });
+        playNote(480, 0.35, 'triangle', 0.2);
+        setTimeout(() => {
+          [440, 554.37, 659.25, 880, 1046.5, 1318.51].forEach((f, i) => {
+            setTimeout(() => playNote(f, 1.5, 'sine', 0.16), i * 80);
+          });
+        }, 180);
       }
 
-      const doorLeaf = document.getElementById('secretDoorLeaf');
-      doorLeaf.classList.add('door-opened');
-
-      if (navigator.vibrate) {
-        navigator.vibrate([40, 80, 60]);
-      }
-
-      // Confetti tunnel burst
-      confetti({
-        particleCount: 45,
-        spread: 80,
-        origin: { y: 0.55 },
-        colors: ['#818cf8', '#a855f7', '#ec4899', '#38bdf8']
-      });
-
-      // After door swing animation, transition to main content
+      // Second: Open door smoothly & illuminate portal
       setTimeout(() => {
-        revealContent();
-      }, 1100);
+        const doorLeaf = document.getElementById('secretDoorLeaf');
+        const portalGlow = document.getElementById('doorPortalGlow');
+        const tunnelVortex = document.getElementById('tunnelVortex');
+        const container = document.getElementById('doorPortalContainer');
+
+        doorLeaf.classList.add('door-opened');
+        
+        if (portalGlow) {
+          portalGlow.classList.remove('via-purple-500/0');
+          portalGlow.classList.add('via-purple-500/50', 'from-indigo-500/40', 'to-cyan-400/40');
+        }
+
+        if (tunnelVortex) {
+          tunnelVortex.style.filter = 'brightness(1.35) drop-shadow(0 0 20px rgba(129, 140, 248, 0.8))';
+        }
+
+        // Spawn Coraline symbols directly emanating from the door center
+        const doorRect = container.getBoundingClientRect();
+        const doorCenterX = doorRect.left + doorRect.width / 2;
+        const doorCenterY = doorRect.top + doorRect.height / 2;
+
+        for (let i = 0; i < 18; i++) {
+          setTimeout(() => {
+            touchHearts.push(new FloatingHeart(
+              doorCenterX + (Math.random() * 40 - 20),
+              doorCenterY + (Math.random() * 40 - 20)
+            ));
+          }, i * 35);
+        }
+
+        if (navigator.vibrate) {
+          navigator.vibrate([40, 60, 40]);
+        }
+
+        // Soft stardust confetti bursting forward
+        confetti({
+          particleCount: 40,
+          spread: 75,
+          origin: {
+            x: doorCenterX / window.innerWidth,
+            y: doorCenterY / window.innerHeight
+          },
+          colors: ['#818cf8', '#c084fc', '#38bdf8', '#f472b6', '#ffffff'],
+          ticks: 180
+        });
+
+        // Third: Camera dive-in / absorption zoom into the tunnel
+        setTimeout(() => {
+          container.classList.add('tunnel-dive-zoom');
+          document.getElementById('coverSection').classList.add('opacity-0', 'transition-opacity', 'duration-700');
+        }, 550);
+
+        // Transition to main content smoothly
+        setTimeout(() => {
+          revealContent();
+        }, 1400);
+
+      }, 240);
     }
 
     function revealContent() {
